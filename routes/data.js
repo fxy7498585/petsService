@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var fs = require('fs');
 var PATH = './public/data/';
+var moment = require('moment');
 
 //读取数据模块，供客户端调用
 //查询接口，token校验
@@ -48,23 +49,42 @@ router.get('/write', function(req, res, next){
   //文件名
   var type = req.query.type || '';
   //关键字段
-  var name = req.query.name || '';
-  var imgUrl = req.query.imgUrl || '';
-  var price = req.query.price || '';
-  var direction = req.query.direction || '';
-  var videoUrl = req.query.videoUrl || '';
-  console.log(type);
-    console.log(name);
-    console.log(imgUrl);
-    console.log(direction);
-    console.log(videoUrl);
+    if(type=="listContent"){//首页listContent数据存储
+        var title=req.query.title || '';
+        var imagesUrl=req.query.imagesUrl || '';
+        var content=req.query.content || '';
+        if(!type || !title || !imagesUrl || !content){
+            return res.send({
+                status:0,
+                info:'提交的字段不全'
+            });
+        }
+    }else if(type=="dog"||type=="cat"||type=="petsProduct"){
+        var name=req.query.name || '';
+        var imgUrl=req.query.imgUrl || '';
+        var price=req.query.price || '';
+        var direction=req.query.direction || '';
+        var videoUrl=req.query.videoUrl || '';
+        if(type=="petsProduct") {
+            if(!type || !name || !price || !imgUrl){
+                return res.send({
+                    status:0,
+                    info:'提交的字段不全'
+                });
+            }
+        }else if(!type || !name || !price || !direction || !videoUrl || !imgUrl){
+            return res.send({
+                status:0,
+                info:'提交的字段不全'
+            });
+        }
+    }
+    console.log(type);
+    console.log(title);
+    console.log(imagesUrl);
+    console.log(content);
 
-  if(!type || !name || !imgUrl || !direction || !videoUrl){
-    return res.send({
-      status:0,
-      info:'提交的字段不全'
-    });
-  }
+
   //1)读取文件
   var filePath = PATH + type + '.json';
   console.log(1);
@@ -78,15 +98,27 @@ router.get('/write', function(req, res, next){
     }
     var arr = JSON.parse(data.toString());
     //代表每一条记录
-    var obj = {
-      name: name,
-      img: imgUrl,
-      price:price,
-      petsDirection: direction,
-      video:videoUrl,
-      flag: guidGenerate(),
-      time: new Date()
-    };
+    if(type=="listContent"){
+        var obj = {
+            title: title,
+            imagesUrl: imagesUrl,
+            content:content,
+            flag: guidGenerate(),
+            time: moment().format('L'),
+            switcher:'off'
+        };
+    }else if(type=="dog"||type=="cat"||type=="petsProduct"){
+        var obj = {
+            name: name,
+            img: imgUrl,
+            price:price,
+            petsDirection:type=='petsProduct'?"":direction,
+            video:type=='petsProduct'?"":videoUrl,
+            flag: guidGenerate(),
+            time: moment().format('L')
+        };
+    }
+
     arr.splice(0, 0, obj);
     //2)写入文件
     var newData = JSON.stringify(arr);

@@ -14,11 +14,45 @@ router.get('/login', function(req, res, next) {
   res.render('login', {});
 });
 
-router.get('/tuijian', function(req, res, next) {
+router.get('/editListContent', function(req, res, next) {
   if(!req.session.user){
     return res.render('login', {});
   }
-  res.render('tuijian', {});
+    var type = req.query.type;
+    console.log(type);
+    if(type){
+        var obj = {};
+        switch (type){
+            case 'listContent':
+                obj = {};
+                break;
+            default :
+                return res.send({
+                    status:0,
+                    info: '参数错误'
+                });
+                break;
+        }
+        fs.readFile(PATH + type + '.json', (err, data) => {
+            if (err) {
+                return res.send({
+                    status:0,
+                    info: 'fail.....'
+                });
+            }
+            var obj = JSON.parse(data.toString());
+            return res.render('editListContent', {
+                data: obj
+            });
+        });
+
+    }else{
+        return res.send({
+            status:0,
+            info: '参数错误'
+        });
+    }
+  // res.render('editListContent', {});
 });
 
 router.get('/edit', function(req, res, next) {
@@ -29,13 +63,13 @@ router.get('/edit', function(req, res, next) {
   if(type){
     var obj = {};
     switch (type){
-      case 'sanwen':
+      case 'cat':
         obj = {};
         break;
       case 'dog':
         obj = {};
         break;
-      case 'manager':
+      case 'petsProduct':
         obj = {};
         break;
       case 'cookies':

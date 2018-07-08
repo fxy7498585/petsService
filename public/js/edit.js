@@ -6,6 +6,15 @@
   }
 
   var type = getQueryString('type');
+  if(type=='petsProduct'){
+      $('#hide1').hide();
+      $('#hide2').hide();
+      // $('#videoUrl').val("此处不用填写");
+      // $('#direction').val("此处不用填写");
+      // $('#videoUrl').attr("disabled","disabled");
+      // $('#direction').attr("disabled","disabled");
+      $('.productKind').html('用品名称');
+  }
 
   $('.addinfo_btn').on('click', function(){
     if(!type){
@@ -22,8 +31,8 @@
        name:name,
         price:price,
        imgUrl: imgUrl,
-       direction: direction,
-       videoUrl: videoUrl
+       direction:type=="petsProduct"?"":direction,
+       videoUrl:type=="petsProduct"?"": videoUrl
     };
       console.log(obj);
     $.ajax({
